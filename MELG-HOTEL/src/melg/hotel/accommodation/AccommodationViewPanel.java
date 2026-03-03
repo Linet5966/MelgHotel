@@ -8,6 +8,7 @@ import java.util.Calendar;
 import java.util.Date;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.CompoundBorder;
 
 /**
  * Comprehensive Accommodation Booking View Panel
@@ -209,56 +210,89 @@ public class AccommodationViewPanel extends JPanel {
         panel.setBackground(new Color(27, 54, 45));
         panel.setBorder(new EmptyBorder(10, 0, 10, 0));
 
-        // Total Price
+        // Total Price - Professional styling
         JPanel pricePanel = new JPanel(new BorderLayout());
         pricePanel.setBackground(new Color(34, 72, 56)); // Panel green
-        pricePanel.setBorder(new EmptyBorder(15, 30, 15, 30));
+        pricePanel.setBorder(new CompoundBorder(
+                BorderFactory.createLineBorder(new Color(229, 218, 195), 2),
+                new EmptyBorder(20, 30, 20, 30)
+        ));
 
-        JLabel priceTextLabel = new JLabel("Total Price:");
-        priceTextLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
-        priceTextLabel.setForeground(Color.WHITE);
+        JLabel priceTextLabel = new JLabel("Total Booking Cost");
+        priceTextLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
+        priceTextLabel.setForeground(new Color(229, 218, 195)); // Gold text
 
         totalPriceLabel = new JLabel("Ksh 8,000.00");
-        totalPriceLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
+        totalPriceLabel.setFont(new Font("SansSerif", Font.BOLD, 32));
         totalPriceLabel.setForeground(new Color(229, 218, 195)); // Gold for price amount
 
-        pricePanel.add(priceTextLabel, BorderLayout.WEST);
-        pricePanel.add(totalPriceLabel, BorderLayout.EAST);
+        JPanel costContentPanel = new JPanel(new BorderLayout());
+        costContentPanel.setBackground(new Color(34, 72, 56));
+        costContentPanel.add(priceTextLabel, BorderLayout.WEST);
+        costContentPanel.add(totalPriceLabel, BorderLayout.EAST);
+
+        pricePanel.add(costContentPanel);
 
         panel.add(pricePanel);
-        panel.add(Box.createVerticalStrut(20));
+        panel.add(Box.createVerticalStrut(30));
 
-        // Buttons
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        // Buttons - Professional styling with larger size
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 10));
         buttonPanel.setBackground(new Color(27, 54, 45));
 
-        JButton bookButton = createStyledButton("Book Now", new Color(229, 218, 195), new Color(27, 54, 45));
-        JButton cancelButton = createStyledButton("Cancel", new Color(200, 100, 100), new Color(27, 54, 45));
+        JButton bookButton = createStyledButton("🏨 BOOK NOW ✓", new Color(76, 175, 80), Color.WHITE);
+        JButton cancelButton = createStyledButton("✕ CANCEL", new Color(244, 67, 54), Color.WHITE);
+
+        bookButton.setPreferredSize(new Dimension(200, 60));
+        cancelButton.setPreferredSize(new Dimension(200, 60));
 
         bookButton.addActionListener(e -> {
+            String name = nameField.getText().trim();
             String gender = (String) genderCombo.getSelectedItem();
             int numPeople = (Integer) numPeopleSpinner.getValue();
             String roomType = vipRadio.isSelected() ? "VIP" : "Regular";
             String paymentMethod = paymentPanel.getSelectedPaymentMethod();
 
+            if (name.isEmpty()) {
+                JOptionPane.showMessageDialog(null,
+                        "Please enter your name to proceed with booking.",
+                        "Name Required",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            String confirmationMessage = "🏨 ════════════════════════════════════ 🏨\n" +
+                    "   MELG HOTEL BOOKING CONFIRMATION\n" +
+                    "🏨 ════════════════════════════════════ 🏨\n\n" +
+                    "✓ Guest Name: " + name + "\n" +
+                    "✓ Gender: " + gender + "\n" +
+                    "✓ Number of Guests: " + numPeople + "\n" +
+                    "✓ Room Type: " + roomType + "\n" +
+                    "✓ Payment Method: " + paymentMethod + "\n\n" +
+                    "💰 Total Cost: " + totalPriceLabel.getText() + "\n\n" +
+                    "🏨 ════════════════════════════════════ 🏨\n" +
+                    "Thank you for choosing MELG HOTEL!\n" +
+                    "Your booking reference will be sent via email.";
+
             JOptionPane.showMessageDialog(null,
-                    "Booking Confirmed!\n\n" +
-                            "Gender: " + gender + "\n" +
-                            "People: " + numPeople + "\n" +
-                            "Room Type: " + roomType + "\n" +
-                            "Payment: " + paymentMethod + "\n" +
-                            "Total (Ksh): " + totalPriceLabel.getText(),
-                    "Booking Confirmation",
+                    confirmationMessage,
+                    "✓ Booking Confirmed - MELG HOTEL",
                     JOptionPane.INFORMATION_MESSAGE);
         });
 
         cancelButton.addActionListener(e -> {
-            // Reset form
-            nameField.setText("");
-            genderCombo.setSelectedIndex(0);
-            contactField.setText("");
-            numPeopleSpinner.setValue(1);
-            regularRadio.setSelected(true);
+            int confirm = JOptionPane.showConfirmDialog(null,
+                    "Are you sure you want to cancel this booking?",
+                    "Cancel Booking",
+                    JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                // Reset form
+                nameField.setText("");
+                genderCombo.setSelectedIndex(0);
+                contactField.setText("");
+                numPeopleSpinner.setValue(1);
+                regularRadio.setSelected(true);
+            }
         });
 
         buttonPanel.add(bookButton);
@@ -287,14 +321,38 @@ public class AccommodationViewPanel extends JPanel {
 
     private JButton createStyledButton(String text, Color bgColor, Color textColor) {
         JButton button = new JButton(text);
-        button.setFont(new Font("SansSerif", Font.BOLD, 14));
+        button.setFont(new Font("SansSerif", Font.BOLD, 18));
         button.setBackground(bgColor);
         button.setForeground(textColor);
         button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createLineBorder(bgColor, 2));
-        button.setPreferredSize(new Dimension(150, 40));
+        button.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(bgColor, 2),
+                new EmptyBorder(8, 16, 8, 16)
+        ));
+        button.setContentAreaFilled(true);
+        button.setOpaque(true);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        // Add hover effect
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(adjustBrightness(bgColor, -30));
+                button.setForeground(textColor);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(bgColor);
+                button.setForeground(textColor);
+            }
+        });
+        
         return button;
+    }
+
+    private Color adjustBrightness(Color color, int adjustment) {
+        int r = Math.max(0, Math.min(255, color.getRed() + adjustment));
+        int g = Math.max(0, Math.min(255, color.getGreen() + adjustment));
+        int b = Math.max(0, Math.min(255, color.getBlue() + adjustment));
+        return new Color(r, g, b);
     }
 
     private JPanel createDatePanel(int daysOffset) {

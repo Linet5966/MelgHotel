@@ -220,59 +220,89 @@ public class RoomStatusPanel extends JPanel {
     private JPanel createRoomCard(Map<String, Object> room) {
         JPanel card = new JPanel();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-        card.setBackground(new Color(34, 72, 56)); // Panel green
-        card.setBorder(BorderFactory.createLineBorder(new Color(229, 218, 195), 2));
-        card.setBorder(new EmptyBorder(10, 10, 10, 10));
+        card.setBackground(new Color(40, 85, 70));
+        card.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(229, 218, 195), 3),
+                new EmptyBorder(12, 12, 12, 12)
+        ));
+        card.setMaximumSize(new Dimension(280, 420));
 
         String roomNumber = (String) room.get("room_number");
         String status = (String) room.get("status");
         double price = (Double) room.get("price");
+        String roomType = (String) room.get("room_type");
 
-        // Optional image for the room
-        JLabel imgLabel = createRoomImageLabel(roomNumber);
+        // Professional room image (larger)
+        JLabel imgLabel = createRoomImageLabel(roomNumber, roomType);
         imgLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        imgLabel.setMaximumSize(new Dimension(256, 160));
         card.add(imgLabel);
-        card.add(Box.createVerticalStrut(8));
+        card.add(Box.createVerticalStrut(10));
 
-        // Room Number
+        // Room Number - larger & bold
         JLabel roomNumLabel = new JLabel(roomNumber);
-        roomNumLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
-        roomNumLabel.setForeground(Color.WHITE);
+        roomNumLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
+        roomNumLabel.setForeground(new Color(229, 218, 195)); // Gold accent
         roomNumLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         card.add(roomNumLabel);
         card.add(Box.createVerticalStrut(8));
 
-        // Status Badge
-        JLabel statusLabel = new JLabel(status);
-        statusLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
-        statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // Set status color
-        if ("Available".equals(status)) {
-            statusLabel.setForeground(new Color(100, 200, 100)); // Green for available
-            statusLabel.setOpaque(true);
-            statusLabel.setBackground(new Color(50, 100, 50));
-        } else if ("Booked".equals(status)) {
-            statusLabel.setForeground(new Color(255, 100, 100)); // Red for booked
-            statusLabel.setOpaque(true);
-            statusLabel.setBackground(new Color(100, 50, 50));
-        } else { // Not Reserved
-            statusLabel.setForeground(new Color(200, 200, 100)); // Yellow for not reserved
-            statusLabel.setOpaque(true);
-            statusLabel.setBackground(new Color(100, 100, 50));
-        }
-        statusLabel.setBorder(new EmptyBorder(5, 8, 5, 8));
-        card.add(statusLabel);
+        // Amenities
+        JLabel amenitiesLabel = createAmenitiesLabel(roomType);
+        amenitiesLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        card.add(amenitiesLabel);
         card.add(Box.createVerticalStrut(8));
 
-        // Price
-        JLabel priceLabel = new JLabel("Ksh " + String.format("%.0f", price));
-        priceLabel.setFont(new Font("SansSerif", Font.PLAIN, 11));
-        priceLabel.setForeground(new Color(200, 200, 200));
+        // Status Badge - enhanced
+        JLabel statusLabel = new JLabel("  " + status + "  ");
+        statusLabel.setFont(new Font("SansSerif", Font.BOLD, 11));
+        statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        if ("Available".equals(status)) {
+            statusLabel.setForeground(Color.WHITE);
+            statusLabel.setOpaque(true);
+            statusLabel.setBackground(new Color(76, 175, 80)); // Material Green
+        } else if ("Booked".equals(status)) {
+            statusLabel.setForeground(Color.WHITE);
+            statusLabel.setOpaque(true);
+            statusLabel.setBackground(new Color(244, 67, 54)); // Material Red
+        } else {
+            statusLabel.setForeground(Color.WHITE);
+            statusLabel.setOpaque(true);
+            statusLabel.setBackground(new Color(255, 152, 0)); // Material Orange
+        }
+        statusLabel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.WHITE, 1),
+                new EmptyBorder(5, 10, 5, 10)
+        ));
+        card.add(statusLabel);
+        card.add(Box.createVerticalStrut(10));
+
+        // Price - emphasized
+        JLabel priceLabel = new JLabel("Ksh " + String.format("%,.0f", price));
+        priceLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
+        priceLabel.setForeground(new Color(229, 218, 195));
         priceLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         card.add(priceLabel);
 
+        JLabel nightLabel = new JLabel("per night");
+        nightLabel.setFont(new Font("SansSerif", Font.ITALIC, 10));
+        nightLabel.setForeground(Color.WHITE);
+        nightLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        card.add(nightLabel);
+
         return card;
+    }
+
+    private JLabel createAmenitiesLabel(String roomType) {
+        String amenities = "VIP".equals(roomType) 
+            ? "🛏️ King Bed • 🚿 Luxury Bath • 🍷 Mini Bar"
+            : "🛏️ Queen Bed • 🚿 Modern Bath • 📺 Smart TV";
+        JLabel label = new JLabel(amenities);
+        label.setFont(new Font("SansSerif", Font.PLAIN, 9));
+        label.setForeground(new Color(200, 200, 200));
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+        return label;
     }
 
     private JPanel createLegendPanel() {
@@ -370,26 +400,38 @@ public class RoomStatusPanel extends JPanel {
 
     /**
      * Attempt to load an image for the given room number. If not found, returns
-     * a placeholder label.
+     * a placeholder label with room-specific images based on type.
      */
-    private JLabel createRoomImageLabel(String roomNumber) {
+    private JLabel createRoomImageLabel(String roomNumber, String roomType) {
         JLabel label = new JLabel();
-        label.setPreferredSize(new Dimension(120, 80));
+        label.setPreferredSize(new Dimension(256, 160));
+        label.setOpaque(true);
+        label.setBackground(new Color(50, 50, 50));
         try {
             java.net.URL imgUrl = getClass().getResource("/melg/hotel/images/" + roomNumber + ".jpg");
             if (imgUrl != null) {
                 ImageIcon icon = new ImageIcon(imgUrl);
-                Image scaled = icon.getImage().getScaledInstance(120, 80, Image.SCALE_SMOOTH);
+                Image scaled = icon.getImage().getScaledInstance(256, 160, Image.SCALE_SMOOTH);
                 label.setIcon(new ImageIcon(scaled));
             } else {
-                // fall back to online placeholder with room number text
-                java.net.URL placeholder = new java.net.URL("https://via.placeholder.com/120x80?text=" + java.net.URLEncoder.encode(roomNumber, "UTF-8"));
-                ImageIcon icon = new ImageIcon(placeholder);
-                Image scaled = icon.getImage().getScaledInstance(120, 80, Image.SCALE_SMOOTH);
-                label.setIcon(new ImageIcon(scaled));
+                // Professional placeholder based on room type
+                String placeholder = "VIP".equals(roomType)
+                    ? "https://images.unsplash.com/photo-1631049307038-da0ec89d4d0a?w=256&h=160&fit=crop"
+                    : "https://images.unsplash.com/photo-1578502494516-52d7e1e62842?w=256&h=160&fit=crop";
+                
+                try {
+                    ImageIcon icon = new ImageIcon(new java.net.URL(placeholder));
+                    Image scaled = icon.getImage().getScaledInstance(256, 160, Image.SCALE_SMOOTH);
+                    label.setIcon(new ImageIcon(scaled));
+                } catch (Exception e) {
+                    label.setText("Room " + roomNumber);
+                    label.setForeground(Color.WHITE);
+                    label.setHorizontalAlignment(SwingConstants.CENTER);
+                    label.setVerticalAlignment(SwingConstants.CENTER);
+                }
             }
         } catch (Exception e) {
-            label.setText("No Image");
+            label.setText("Room " + roomNumber);
             label.setForeground(Color.WHITE);
             label.setHorizontalAlignment(SwingConstants.CENTER);
             label.setVerticalAlignment(SwingConstants.CENTER);
