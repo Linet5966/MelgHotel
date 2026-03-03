@@ -382,10 +382,11 @@ public class RoomStatusPanel extends JPanel {
                 Image scaled = icon.getImage().getScaledInstance(120, 80, Image.SCALE_SMOOTH);
                 label.setIcon(new ImageIcon(scaled));
             } else {
-                label.setText("No Image");
-                label.setForeground(Color.WHITE);
-                label.setHorizontalAlignment(SwingConstants.CENTER);
-                label.setVerticalAlignment(SwingConstants.CENTER);
+                // fall back to online placeholder with room number text
+                java.net.URL placeholder = new java.net.URL("https://via.placeholder.com/120x80?text=" + java.net.URLEncoder.encode(roomNumber, "UTF-8"));
+                ImageIcon icon = new ImageIcon(placeholder);
+                Image scaled = icon.getImage().getScaledInstance(120, 80, Image.SCALE_SMOOTH);
+                label.setIcon(new ImageIcon(scaled));
             }
         } catch (Exception e) {
             label.setText("No Image");
